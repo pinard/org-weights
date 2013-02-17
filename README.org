@@ -1,7 +1,25 @@
 #+TITLE: org-weights — Show how heavy Org subtrees are
 
-Display the weights for every Org header which was visible at the
-time the mode was activated.  The weights of a header are the
-counts of subtrees and paragraphs for the the subtree starting with
-that header.  Paragraphs includes items and other equivalent
-structures.
+Display the weights for every Org header which was visible at the time
+the mode was activated.  The weights of a header are the counts of
+sub-trees and paragraphs for the the sub-tree starting with that header.
+Paragraphs include items and other equivalent structures.
+
+While this code is fast enough for my needs, it uses a bit of
+quadratic time for headers scanning, so it might become slow if there
+were a big number of headers.
+
+[2013-02-17 dim] A few times already, I spoke on the Org mailing list
+of my need to see the weights of sub-trees on header lines.  Nicolas
+Goaziou was kind enough to write the function for computing the
+weights, I wrapped some Lisp code around this, and shared the result
+on the list.  In that code, I had a command which computes and
+displays the weights, and as soon as I modify the buffer, the weights
+were disappearing.
+
+I recently had the need to frequently re-evaluate the weights after
+modifications, and got tired of repeating the displaying command after
+each modification.  So I adapted the code so the weights get updated
+instead of disappearing.  Bastien also suggested that I turn my code
+into a small library, so here it is.  It works relatively OK for me.
+Bugs surely remain. :-)
