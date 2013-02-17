@@ -1,0 +1,7 @@
+#+TITLE: org-weights — Show how heavy Org subtrees are
+
+Display the weights for every Org header which was visible at the
+time the mode was activated.  The weights of a header are the
+counts of subtrees and paragraphs for the the subtree starting with
+that header.  Paragraphs includes items and other equivalent
+structures.
