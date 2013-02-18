@@ -1,25 +1,105 @@
 #+TITLE: org-weights — Show how heavy Org subtrees are
 
-Display the weights for every Org header which was visible at the time
-the mode was activated.  The weights of a header are the counts of
-sub-trees and paragraphs for the the sub-tree starting with that header.
-Paragraphs include items and other equivalent structures.
+** Introduction
+*org-weights* is an Emacs minor mode usable over Org format files.  It
+displays the weights for every Org header which was visible at the
+time the mode was activated.  The weights of a header are the counts
+of sub-trees and paragraphs for the the sub-tree starting with that
+header.  Paragraphs include items and other equivalent structures.
 
-While this code is fast enough for my needs, it uses a bit of
-quadratic time for headers scanning, so it might become slow if there
-were a big number of headers.
+The mode gets activated or deactivated with =M-x org-weights-mode RET=.
+Whenever this minor mode gets activated, all headers which are visible
+then display, towards the right side of the window, a small region
+which hides the contents beneath if any.  That region contains a
+sequence of asterisks acting as a reminder for the current header
+level, then either one or two counters.  One of them shows the number
+of included items or paragraphs below the sub-tree of the Org file
+under the current header, the other gives the number of sub-headers if
+any, in which case that second number is shown within parentheses and
+with the letter =h= as a reminder that this is a header count.
 
-[2013-02-17 dim] A few times already, I spoke on the Org mailing list
-of my need to see the weights of sub-trees on header lines.  Nicolas
-Goaziou was kind enough to write the function for computing the
-weights, I wrapped some Lisp code around this, and shared the result
-on the list.  In that code, I had a command which computes and
-displays the weights, and as soon as I modify the buffer, the weights
-were disappearing.
+The numbers are not shown for a header line when the edition cursor
+(the /point/ in Emacs parlance) happens to be on that line, so to not
+interfere with line editing.  As soon as the cursor moves out of a
+header line, the monitoring resumes for that line.
 
-I recently had the need to frequently re-evaluate the weights after
-modifications, and got tired of repeating the displaying command after
-each modification.  So I adapted the code so the weights get updated
-instead of disappearing.  Bastien also suggested that I turn my code
-into a small library, so here it is.  It works relatively OK for me.
-Bugs surely remain. :-)
+Under *org-weights* mode, these numbers get updated dynamically while
+the Org file is being edited.  If new headers are added, or otherwise
+revealed after having been hidden, *org-weights* do not start tracking
+them: one as to re-activate *org-weights* minor mode again for them to
+be monitored as well.
+** Installation
+To install *org-weights*, just copy =org-weights.el= somewhere Emacs may
+find it.  Optionally, assign some key binding to toggle the mode.  For
+one, I added these lines to my =~/.emacs= file:
+
+  #+BEGIN_SRC elisp
+    (autoload 'org-weights-mode "org-weights" nil t)
+    (define-key org-mode-map "\C-cow" 'org-weights-mode)
+  #+END_SRC
+
+yet of course, one may choose any other key binding.
+
+** Purpose, history
+It happened that I chose Org to write short manuals for my customers.
+Even if this is theoretically immaterial, I find a manual more
+comfortable when chapters, and sections within chapters, do not too
+wildly vary in size.  Too big a section often means that the section
+has to be broken up in smaller chunks, and it is often possible to
+merge smallish sections together, given of course that some logic
+could be created to make such a merge reasonable.
+
+[2012-02-26 dim] After I spoke on the Org mailing list of my need to
+see the weights of sub-trees on header lines, Nicolas Goaziou was kind
+enough to share a function for computing the weights.  I merely
+wrapped some more Lisp code around his skeleton.  At the time, a
+command was displaying the weights, which were all vanishing as soon
+as any modifying action was made to the Org file.  This encouraged me
+at reaching the equilibrium I wanted in my manuals.
+
+[2013-02-17 dim] Nowadays, I have hundreds of Org files containing
+notes of all kinds, which I often feel like cleaning or re-organizing
+when visiting them.  It always help having an overall idea of the work
+needed to revise or otherwise handle sections of an Org file, by
+getting an idea of the weight of each header.  Knowing the energy you
+currently have, or how much time is available, I may select if I'll
+tackle a bigger node or a smaller node.  That's a simple thing, but it
+helps me at better investing the bits of time I have.  So, this mode
+keeps being useful to me.  I more recently had the need to frequently
+re-evaluate the weights after modifications, and got tired of
+repeating the displaying command after each modification.  So I
+adapted the code so the weights get updated instead of disappearing.
+Bastien also suggested that I turn my code into a small library: here
+it is.
+** Caveats
+*org-weights* works relatively OK for me.  Bugs surely remain.  Here are
+those I noticed:
+
+  + In case of a demotion, the previous header needs updating.
+    Currently, after some part of an Org file changes, the weights of
+    its header is revised, and recursively up to the root.  However,
+    after a demotion, the header that was immediately holding the
+    demoted header is not in its up chain anymore, and so, it is not
+    revised.  An easy work around is to move the cursor on that wrong
+    header and out, the weights then get recomputed.
+
+  + Cut and pasting seems to move overlays as well?  I got a few
+    spurious overlays through such operations.  I guess I would have
+    to study and understand better how it all works.
+
+  + While this code is fast enough for my needs, it uses a bit of
+    quadratic time while scanning for headers, so it might become slow
+    if there were a big number of headers.  This could be alleviated
+    if weights computed deeper down a tree were re-used without
+    recomputing them anew to get the weights at an upper level of the
+    hierarchy.
+
+  + I much like *org-bullets* mode, but there are some display problems
+    associated with it.  Using =M-x recenter-top-bottom= (=C-l=) usually
+    solve them.  However, *org-bullets* and *org-weights* interact in some
+    bad way, and the display problem then gets more annoying.  Around
+    that problem, *org-weight* detects if *org-bullets* is already loaded
+    and deactivates it when itself gets activated, and reactivates it
+    when itself gets deactivated.  However, it should only
+    reactivate *org-bullets* if it once was active: merely checking that
+    it is loaded is not enough to take the proper decision.
