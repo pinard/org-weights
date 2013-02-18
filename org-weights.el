@@ -63,7 +63,7 @@
                'org-weights-pre-command 'local)
   (remove-hook 'post-command-hook
                'org-weights-post-command 'local)
-  (unless org-weights-mode
+  (when org-weights-mode
     (save-excursion
       (goto-char (point-min))
       (outline-next-visible-heading 1)
