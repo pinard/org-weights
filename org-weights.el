@@ -41,7 +41,8 @@
   ;; Should be high enough for tags to stay visible.
   "Column where the weight overlay should be displayed.")
 
-(defvar org-weights-overlays nil)
+(defvar org-weights-overlays nil
+  "Running list of currently displayed overlays.")
 (make-variable-buffer-local 'org-weights-overlays)
 
 (defvar org-weights-saved-start nil
@@ -53,9 +54,8 @@
   (mapc 'delete-overlay org-weights-overlays)
   (setq org-weights-overlays nil)
   (when (fboundp 'org-bullets-mode)
-    ;; There are some annoying bugs in org-bullets-mode.  As a
+    ;; There seems to be some annoying bug in org-bullets-mode.  As a
     ;; compromise, it gets only activated when weights are not shown.
-    ;; FIXME: Should be re-activated only if it was already active.
     (org-bullets-mode 1))
   (remove-hook 'after-change-functions
                'org-weights-after-change 'local)
@@ -85,8 +85,6 @@
 
 (defun org-weights-after-change (begin end replaced)
   "Recompute overlays for all headers between BEGIN and END, and up for each."
-  ;; FIXME: In case of a demotion, the previous header needs updating,
-  ;; but is not up anymore; some mean should force it nevertheless.
   (save-match-data
     (save-excursion
       (let ((bol (point-at-bol))
@@ -165,8 +163,7 @@ Prefix weights with LEVEL number of stars."
                              (if (zerop paragraphs) "" paragraphs)
                              (if (zerop headers) "" (format "(%s h)"
                                                             headers)))
-                     (list 'face 'org-weights-face))
-                 "")))
+                     (list 'face 'org-weights-face)))))
       (if (not (featurep 'xemacs))
           (overlay-put overlay 'display text)
         (overlay-put overlay 'invisible t)
