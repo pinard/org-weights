@@ -53,10 +53,6 @@
   nil nil nil
   (mapc 'delete-overlay org-weights-overlays)
   (setq org-weights-overlays nil)
-  (when (fboundp 'org-bullets-mode)
-    ;; There seems to be some annoying bug in org-bullets-mode.  As a
-    ;; compromise, it gets only activated when weights are not shown.
-    (org-bullets-mode 1))
   (remove-hook 'after-change-functions
                'org-weights-after-change 'local)
   (remove-hook 'pre-command-hook
@@ -72,8 +68,6 @@
           (org-weights-set-overlay (org-weights-at-point)
                                      (funcall outline-level)))
         (outline-next-visible-heading 1))
-      (when (fboundp 'org-bullets-mode)
-        (org-bullets-mode 0))
       (add-hook 'after-change-functions 'org-weights-after-change
                 nil 'local)
       (add-hook 'pre-command-hook 'org-weights-pre-command
