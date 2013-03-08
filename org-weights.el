@@ -152,9 +152,9 @@ Prefix weights with LEVEL number of stars."
                  (buffer-substring (1- (point)) (point))
                  (make-string (+ 2 filler) ? )
                  (org-add-props
-                     (format "%s %3s %6s " level-string paragraphs
+                     (format "%s %3s%s" level-string paragraphs
                              (if (zerop headers) ""
-                               (format "(%s h)" headers)))
+                               (format " + %s" headers)))
                      (list 'face 'org-weights-face)))))
       (if (not (featurep 'xemacs))
           (overlay-put overlay 'display text)
