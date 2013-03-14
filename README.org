@@ -1,12 +1,21 @@
 #+TITLE: org-weights — Show how heavy Org subtrees are
+*org-weights* is an Emacs minor mode for Org format files.  It displays
+the weights for visible Org headers directly on the header line.  The
+weights of a header are the counts of sub-trees and paragraphs for the
+the sub-tree starting with that header.  Paragraphs include items and
+other equivalent structures.
+** Installation
+To install *org-weights*, just copy =org-weights.el= somewhere Emacs may
+find it.  Optionally, assign some key binding to toggle the mode.  For
+one, I added these lines to my =~/.emacs= file:
 
-** Introduction
-*org-weights* is an Emacs minor mode usable over Org format files.  It
-displays the weights for every Org header which was visible at the
-time the mode was activated.  The weights of a header are the counts
-of sub-trees and paragraphs for the the sub-tree starting with that
-header.  Paragraphs include items and other equivalent structures.
+  #+BEGIN_SRC elisp
+    (autoload 'org-weights-mode "org-weights" nil t)
+    (define-key org-mode-map "\C-cow" 'org-weights-mode)
+  #+END_SRC
 
+yet of course, one may choose any other key binding.
+** Usage
 The mode gets activated or deactivated with =M-x org-weights-mode RET=.
 Whenever this minor mode gets activated, all headers which are visible
 then display, towards the right side of the window, a small region
@@ -26,20 +35,8 @@ header line, the monitoring resumes for that line.
 Under *org-weights* mode, these numbers get updated dynamically while
 the Org file is being edited.  If new headers are added, or otherwise
 revealed after having been hidden, *org-weights* do not start tracking
-them: one as to re-activate *org-weights* minor mode again for them to
-be monitored as well.
-** Installation
-To install *org-weights*, just copy =org-weights.el= somewhere Emacs may
-find it.  Optionally, assign some key binding to toggle the mode.  For
-one, I added these lines to my =~/.emacs= file:
-
-  #+BEGIN_SRC elisp
-    (autoload 'org-weights-mode "org-weights" nil t)
-    (define-key org-mode-map "\C-cow" 'org-weights-mode)
-  #+END_SRC
-
-yet of course, one may choose any other key binding.
-
+them: one may re-activate *org-weights* minor mode again for them to be
+monitored as well, or merely wander the cursor over the new headers.
 ** Purpose, history
 It happened that I chose Org to write short manuals for my customers.
 Even if this is theoretically immaterial, I find a manual more
@@ -93,13 +90,3 @@ those I noticed:
     if weights computed deeper down a tree were re-used without
     recomputing them anew to get the weights at an upper level of the
     hierarchy.
-
-  + I much like *org-bullets* mode, but there are some display problems
-    associated with it.  Using =M-x recenter-top-bottom= (=C-l=) usually
-    solve them.  However, *org-bullets* and *org-weights* interact in some
-    bad way, and the display problem then gets more annoying.  Around
-    that problem, *org-weight* detects if *org-bullets* is already loaded
-    and deactivates it when itself gets activated, and reactivates it
-    when itself gets deactivated.  However, it should only
-    reactivate *org-bullets* if it once was active: merely checking that
-    it is loaded is not enough to take the proper decision.
