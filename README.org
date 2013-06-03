@@ -56,7 +56,7 @@ at reaching the equilibrium I wanted in my manuals.
 
 [2013-02-17 dim] Nowadays, I have hundreds of Org files containing
 notes of all kinds, which I often feel like cleaning or re-organizing
-when visiting them.  It always help having an overall idea of the work
+when visiting them.  It always helps having an overall idea of the work
 needed to revise or otherwise handle sections of an Org file, by
 getting an idea of the weight of each header.  Knowing the energy you
 currently have, or how much time is available, I may select if I'll
