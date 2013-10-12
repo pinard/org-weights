@@ -190,3 +190,5 @@ Paragraphs (also encompasses equivalent structures)."
       tree '(paragraph table verse-block quote-block src-block example-block)
       (lambda (el) (incf num-el)))
      (cons (1- num-hl) num-el))))
+
+;;; org-weights.el ends here

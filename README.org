@@ -1,10 +1,13 @@
 #+TITLE: org-weights — Show how heavy Org subtrees are
+
 *org-weights* is an Emacs minor mode for Org format files.  It displays
 the weights for visible Org headers directly on the header line.  The
 weights of a header are the counts of sub-trees and paragraphs for the
 the sub-tree starting with that header.  Paragraphs include items and
 other equivalent structures.
+
 ** Installation
+
 To install *org-weights*, just copy =org-weights.el= somewhere Emacs may
 find it.  Optionally, assign some key binding to toggle the mode.  For
 one, I added these lines to my =~/.emacs= file:
@@ -15,7 +18,9 @@ one, I added these lines to my =~/.emacs= file:
   #+END_SRC
 
 yet of course, one may choose any other key binding.
+
 ** Usage
+
 The mode gets activated or deactivated with =M-x org-weights-mode RET=.
 Whenever this minor mode gets activated, all headers which are visible
 then display, towards the right side of the window, a small region
@@ -37,7 +42,9 @@ the Org file is being edited.  If new headers are added, or otherwise
 revealed after having been hidden, *org-weights* do not start tracking
 them: one may re-activate *org-weights* minor mode again for them to be
 monitored as well, or merely wander the cursor over the new headers.
+
 ** Purpose, history
+
 It happened that I chose Org to write short manuals for my customers.
 Even if this is theoretically immaterial, I find a manual more
 comfortable when chapters, and sections within chapters, do not too
@@ -68,7 +75,9 @@ repeating the displaying command after each modification.  So I
 adapted the code so the weights get updated instead of disappearing.
 Bastien also suggested that I turn my code into a small library: here
 it is.
+
 ** Caveats
+
 *org-weights* works relatively OK for me.  Bugs surely remain.  Here are
 those I noticed:
 
