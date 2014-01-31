@@ -37,9 +37,6 @@
      (:background "purple" :foreground "white")))
   "Face for weights information higlights.")
 
-  ;; Should be high enough for tags to stay visible.
-  "Column where the weight overlay should be displayed.")
-
 (defvar org-weights-overlays nil
   "Running list of currently displayed overlays.")
 (make-variable-buffer-local 'org-weights-overlays)
@@ -64,8 +61,7 @@
       (outline-next-visible-heading 1)
       (while (not (eobp))
         (save-excursion
-          (org-weights-set-overlay (org-weights-at-point)
-                                     (funcall outline-level)))
+          (org-weights-set-overlay (org-weights-at-point)))
         (outline-next-visible-heading 1))
       (add-hook 'after-change-functions 'org-weights-after-change
                 nil 'local)
@@ -87,12 +83,10 @@
             (while (and (outline-back-to-heading)
                         (or force (>= (point) begin)))
               (unless (= (point) bol)
-                (org-weights-set-overlay (org-weights-at-point)
-                                           (funcall outline-level)))
+                (org-weights-set-overlay (org-weights-at-point)))
               (save-excursion
                 (while (outline-up-heading 1)
-                  (org-weights-set-overlay (org-weights-at-point)
-                                             (funcall outline-level))))
+                  (org-weights-set-overlay (org-weights-at-point))))
               (setq force nil))
           (error nil))))))
 
@@ -120,22 +114,17 @@ Also, if the line changed, recompute the overlay for saved point."
             (when buffer
               (set-buffer buffer)
               (goto-char org-weights-saved-start)
-              (org-weights-set-overlay (org-weights-at-point)
-                                         (funcall outline-level)))))))))
+              (org-weights-set-overlay (org-weights-at-point)))))))))
 
 ;;;; Routines
 
-(defun org-weights-set-overlay (weights level)
-  "Put an overlays on the current line, displaying WEIGHTS.
-Prefix weights with LEVEL number of stars."
-  (let ((level-string
-         (make-string (if level (org-get-valid-level level 0) 0) ?*))
-        (headers (car weights))
+(defun org-weights-set-overlay (weights)
+  "Put an overlays on the current line, displaying WEIGHTS."
+  (let ((headers (car weights))
         (paragraphs (cdr weights))
-        filler overlay)
-    (org-move-to-column org-weights-overlay-column)
-    (unless (eolp) (skip-chars-backward "^ \t"))
-    (skip-chars-backward " \t")
+        overlay)
+    (beginning-of-line)
+    (skip-chars-forward "*")
     (let ((overlays org-weights-overlays))
       (while overlays
         (let ((maybe (pop overlays)))
@@ -144,16 +133,13 @@ Prefix weights with LEVEL number of stars."
               (setq overlay maybe
                     overlays nil)))))
     (unless overlay
-      (setq overlay (make-overlay (1- (point)) (point-at-eol))))
-    (setq filler (max 0 (- org-weights-overlay-column
-                           (current-column) 2)))
+      (setq overlay (make-overlay (1- (point)) (point) nil t)))
     (let ((text (concat
                  (buffer-substring (1- (point)) (point))
-                 (make-string (+ 2 filler) ? )
                  (org-add-props
-                     (format "%s %3s%s" level-string paragraphs
-                             (if (zerop headers) ""
-                               (format " + %s" headers)))
+                     (if (zerop headers)
+                         (format " %3s    " paragraphs)
+                       (format " %3s %2s " paragraphs headers))
                      (list 'face 'org-weights-face)))))
       (if (not (featurep 'xemacs))
           (overlay-put overlay 'display text)
