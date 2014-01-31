@@ -99,3 +99,8 @@ those I noticed:
     if weights computed deeper down a tree were re-used without
     recomputing them anew to get the weights at an upper level of the
     hierarchy.
+
+  + Overlays are sometimes copied in unexpected ways, like while
+    capturing.  Maybe should *org-weights* be automatically inhibited
+    while capturing, short of solving the real problem?  (Sébastien
+    Vauban, [2013-02-27 mar])
