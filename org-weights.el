@@ -32,12 +32,11 @@
 
 (defface org-weights-face
   '((((class color) (background light))
-     (:foreground "chocolate2" :weight bold))
+     (:background "beige" :foreground "black"))
     (((class color) (background dark))
-     (:foreground "chocolate1" :weight bold)))
+     (:background "purple" :foreground "white")))
   "Face for weights information higlights.")
 
-(defconst org-weights-overlay-column 75
   ;; Should be high enough for tags to stay visible.
   "Column where the weight overlay should be displayed.")
 
