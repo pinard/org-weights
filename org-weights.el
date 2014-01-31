@@ -51,10 +51,6 @@
   (setq org-weights-overlays nil)
   (remove-hook 'after-change-functions
                'org-weights-after-change 'local)
-  (remove-hook 'pre-command-hook
-               'org-weights-pre-command 'local)
-  (remove-hook 'post-command-hook
-               'org-weights-post-command 'local)
   (when org-weights-mode
     (save-excursion
       (goto-char (point-min))
@@ -64,10 +60,6 @@
           (org-weights-set-overlay (org-weights-at-point)))
         (outline-next-visible-heading 1))
       (add-hook 'after-change-functions 'org-weights-after-change
-                nil 'local)
-      (add-hook 'pre-command-hook 'org-weights-pre-command
-                nil 'local)
-      (add-hook 'post-command-hook 'org-weights-post-command
                 nil 'local))))
 
 ;;;; Hooks.
@@ -90,32 +82,6 @@
               (setq force nil))
           (error nil))))))
 
-(defun org-weights-pre-command ()
-  "Save point if it stands within a header line."
-  (save-match-data
-    (save-excursion
-      (beginning-of-line)
-      (setq org-weights-saved-start
-            (and (outline-on-heading-p)
-                 (point-marker))))))
-
-(defun org-weights-post-command ()
-  "If point went on another line, remove the overlay when a header line.
-Also, if the line changed, recompute the overlay for saved point."
-  (save-match-data
-    (save-excursion
-      (beginning-of-line)
-      (unless (and org-weights-saved-start
-                   (= (point) org-weights-saved-start))
-        (when (outline-on-heading-p)
-          (org-weights-unset-overlay))
-        (when org-weights-saved-start
-          (let ((buffer (marker-buffer org-weights-saved-start)))
-            (when buffer
-              (set-buffer buffer)
-              (goto-char org-weights-saved-start)
-              (org-weights-set-overlay (org-weights-at-point)))))))))
-
 ;;;; Routines
 
 (defun org-weights-set-overlay (weights)
@@ -127,11 +93,11 @@ Also, if the line changed, recompute the overlay for saved point."
     (skip-chars-forward "*")
     (let ((overlays org-weights-overlays))
       (while overlays
-        (let ((maybe (pop overlays)))
-          (if (and (>= (point) (overlay-start maybe))
-                   (<= (point) (overlay-end maybe)))
-              (setq overlay maybe
-                    overlays nil)))))
+        (let ((candidate (pop overlays)))
+          (when (and (>= (point) (overlay-start candidate))
+                     (<= (point) (overlay-end candidate)))
+            (setq overlay candidate
+                  overlays nil)))))
     (unless overlay
       (setq overlay (make-overlay (1- (point)) (point) nil t)))
     (let ((text (concat
@@ -146,22 +112,6 @@ Also, if the line changed, recompute the overlay for saved point."
         (overlay-put overlay 'invisible t)
         (overlay-put overlay 'end-glyph (make-glyph text)))
       (push overlay org-weights-overlays))))
-
-(defun org-weights-unset-overlay ()
-  "Remove an overlay from the current line, so it gets edited more easily."
-  (let (overlay)
-    (org-move-to-column org-weights-overlay-column)
-    (unless (eolp) (skip-chars-backward "^ \t"))
-    (skip-chars-backward " \t")
-    (let ((overlays org-weights-overlays))
-      (while (and overlays (not overlay))
-        (let ((maybe (pop overlays)))
-          (if (and (>= (point) (overlay-start maybe))
-                   (<= (point) (overlay-end maybe)))
-              (setq overlay maybe)))))
-    (when overlay
-      (setq org-weights-overlays (delq overlay org-weights-overlays))
-      (delete-overlay overlay))))
 
 ;; Compliment of Nicolas Goaziou <n.goaziou@gmail.com>, 2012-02-26
 (defun org-weights-at-point ()
